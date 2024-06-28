@@ -17,7 +17,6 @@ export default class NewBill {
   }
   handleChangeFile = e => {
     e.preventDefault()
-    //const form = document.querySelector(`form[data-testid="form-new-bill"]`)
     const fileUpload = this.document.querySelector(`input[data-testid="file"]`)
     const file = this.document.querySelector(`input[data-testid="file"]`).files[0]
     const filePath = e.target.value.split(/\\/g)
@@ -27,8 +26,6 @@ export default class NewBill {
     if (!(["jpg", "jpeg", "png"].includes(fileExtension))) {
       alert("Format de fichier invalide, merci de charger uniquement des fichiers jpeg, jpg ou png");
       fileUpload.value = ''
-      //form.reset();
-      return;
     }
     const formData = new FormData()
     const email = JSON.parse(localStorage.getItem("user")).email
@@ -44,7 +41,7 @@ export default class NewBill {
         }
       })
       .then(({fileUrl, key}) => {
-        console.log(fileUrl)
+        //console.log(fileUrl)
         this.billId = key
         this.fileUrl = fileUrl
         this.fileName = fileName
@@ -52,7 +49,10 @@ export default class NewBill {
   }
   handleSubmit = e => {
     e.preventDefault()
-    console.log('e.target.querySelector(`input[data-testid="datepicker"]`).value', e.target.querySelector(`input[data-testid="datepicker"]`).value)
+    if (this.fileUrl == "") {
+      return;
+    }
+    //console.log('e.target.querySelector(`input[data-testid="datepicker"]`).value', e.target.querySelector(`input[data-testid="datepicker"]`).value)
     const email = JSON.parse(localStorage.getItem("user")).email
     const bill = {
       email,

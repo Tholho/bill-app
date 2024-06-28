@@ -20,13 +20,31 @@ const row = (bill) => {
   }
 
 const rows = (data) => {
-  return (data && data.length) ? data.map(bill => row(bill)).join("") : ""
+//  console.log(data)
+  if (data) {
+  const sortedData = data.sort((a, b) => {
+    let dateB = new Date;
+    let dateA = new Date;
+    if (a.sortableDate && b.sortableDate) {
+    dateB = new Date(b.sortableDate);
+    dateA = new Date(a.sortableDate);
+    }
+    else {
+      dateB = new Date(b.date);
+      dateA = new Date(a.date);
+    }
+    return dateB - dateA; // Trier par date décroissante
+  });
+
+  return (data && data.length) ? sortedData.map(bill => row(bill)).join(""): ""
+}
+else return
 }
 
 export default ({ data: bills, loading, error }) => {
   
   const modal = () => (`
-    <div class="modal fade" id="modaleFile" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+    <div class="modal fade" id="modaleFile" data-testid="modaleFile" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
       <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
         <div class="modal-content">
           <div class="modal-header">

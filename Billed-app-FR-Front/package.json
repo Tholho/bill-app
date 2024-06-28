@@ -1,6 +1,7 @@
 {
   "scripts": {
-    "test": "jest --coverage --noStackTrace --silent"
+    "test": "jest --coverage --noStackTrace --silent",
+    "testLog": "jest --coverage --watchAll"
   },
   "jest": {
     "verbose": false,
@@ -18,6 +19,7 @@
   },
   "type": "module",
   "dependencies": {
+    "bootstrap": "^5.3.3",
     "express": "^4.17.1",
     "global": "^4.4.0",
     "jquery": "^3.5.1",

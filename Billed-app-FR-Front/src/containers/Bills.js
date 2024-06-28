@@ -38,6 +38,7 @@ export default class {
             try {
               return {
                 ...doc,
+                sortableDate: doc.date,
                 date: formatDate(doc.date),
                 status: formatStatus(doc.status)
               }
@@ -47,12 +48,12 @@ export default class {
               console.log(e,'for',doc)
               return {
                 ...doc,
+                sortableDate: doc.date,
                 date: doc.date,
                 status: formatStatus(doc.status)
               }
             }
           })
-          console.log('length', bills.length)
         return bills
       })
     }
