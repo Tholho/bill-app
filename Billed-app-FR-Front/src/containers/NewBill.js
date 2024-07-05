@@ -19,13 +19,14 @@ export default class NewBill {
     e.preventDefault()
     const fileUpload = this.document.querySelector(`input[data-testid="file"]`)
     const file = this.document.querySelector(`input[data-testid="file"]`).files[0]
-    const filePath = e.target.value.split(/\\/g)
+    const filePath = file.name.split(/\\/g)
     const fileName = filePath[filePath.length-1]
-    const filePath2 = e.target.value.split(/\./g)
+    const filePath2 = file.name.split(/\./g)
     const fileExtension = filePath2[filePath2.length-1]
     if (!(["jpg", "jpeg", "png"].includes(fileExtension))) {
       alert("Format de fichier invalide, merci de charger uniquement des fichiers jpeg, jpg ou png");
       fileUpload.value = ''
+      return
     }
     const formData = new FormData()
     const email = JSON.parse(localStorage.getItem("user")).email

@@ -3,16 +3,12 @@
  */
 import { fireEvent, screen, waitFor } from "@testing-library/dom"
 import NewBillUI from "../views/NewBillUI.js"
-import BillsUI from "../views/BillsUI.js";
 import NewBill from "../containers/NewBill.js"
 import mockStore from "../__mocks__/store.js"
 import { localStorageMock } from "../__mocks__/localStorage.js"
 import userEvent from "@testing-library/user-event"
 import { ROUTES, ROUTES_PATH } from "../constants/routes.js"
 import router from "../app/Router"
-import { bills } from "../fixtures/bills.js";
-
-
 
 jest.mock("../app/store", () => mockStore)
 const mockCreate = jest.fn(mockStore.bills().create);
@@ -37,6 +33,15 @@ describe("Given I am connected as an employee", () => {
       document.body.innerHTML = html
       const instance = new NewBill({ document, onNavigate, store, localStorage: window.localStorage })
       expect(instance).toBeTruthy()
+      expect(screen.getByText("Envoyer une note de frais")).toBeTruthy()
+      expect(screen.getByTestId("expense-type")).toBeTruthy()
+      expect(screen.getByTestId("expense-name")).toBeTruthy()
+      expect(screen.getByTestId("datepicker")).toBeTruthy()
+      expect(screen.getByTestId("amount")).toBeTruthy()
+      expect(screen.getByTestId("vat")).toBeTruthy()
+      expect(screen.getByTestId("pct")).toBeTruthy()
+      expect(screen.getByTestId("commentary")).toBeTruthy()
+      expect(screen.getByTestId("file")).toBeTruthy()
     })
 
     describe("When I select a file for upload", () => {
@@ -62,13 +67,11 @@ describe("Given I am connected as an employee", () => {
 
         const file = new File(['notImportant'], 'notAnImage.pdf', { type: 'application/pdf' });
 
-        await userEvent.upload(fileInput, file);
+        userEvent.upload(fileInput, file);
 
         expect(handleChangeFile).toHaveBeenCalled();
-
         expect(window.alert).toHaveBeenCalledWith("Format de fichier invalide, merci de charger uniquement des fichiers jpeg, jpg ou png");
-
-        expect(fileInput.value).toBe(""); // L'input devrait être vide
+        expect(fileInput.value).toBe("");
       });
       test("Jpeg, jpg and png files should be accepted", async () => {
         const onNavigate = (pathname) => {
@@ -92,9 +95,9 @@ describe("Given I am connected as an employee", () => {
 
         const fileJpeg = new File(['notImportant'], 'facturefreemobile.jpeg', { type: 'image/jpeg' });
         const fileJpg = new File(['notImportant'], 'facturefreemobile.jpg', { type: 'image/jpg' });
-        const filePng = new File(['dnotImportant'], 'facturefreemobile.png', { type: 'image/png' });
+        const filePng = new File(['notImportant'], 'facturefreemobile.png', { type: 'image/png' });
 
-        await userEvent.upload(fileInput, fileJpeg);
+        userEvent.upload(fileInput, fileJpeg);
 
         expect(handleChangeFile).toHaveBeenCalledTimes(1);
 
@@ -104,7 +107,7 @@ describe("Given I am connected as an employee", () => {
 
         //Testing Jpg files
 
-        await userEvent.upload(fileInput, fileJpg);
+        userEvent.upload(fileInput, fileJpg);
 
         expect(handleChangeFile).toHaveBeenCalledTimes(2);
 
@@ -114,10 +117,8 @@ describe("Given I am connected as an employee", () => {
 
         //Testing Png files
 
-        await userEvent.upload(fileInput, filePng);
-
+        userEvent.upload(fileInput, filePng);
         expect(handleChangeFile).toHaveBeenCalledTimes(3);
-
         expect(fileInput.files[0]).toBe(filePng);
         expect(fileInput.files[0].name).toBe('facturefreemobile.png');
         expect(fileInput.files[0].type).toBe('image/png');
@@ -125,7 +126,6 @@ describe("Given I am connected as an employee", () => {
     })
     describe("When I click on submit and the form is complete", () => {
       test("Then I should return to bills screen", async () => {
-        //In fact in this test the form is incomplete because the code doesnt feature proper form validation
         const onNavigate = (pathname) => {
           document.body.innerHTML = ROUTES({ pathname })
         }
@@ -140,7 +140,6 @@ describe("Given I am connected as an employee", () => {
         await waitFor(() => screen.getByTestId("form-new-bill"))
         const form = screen.getByTestId("form-new-bill")
         fireEvent.submit(form)
-        
         expect(screen.getAllByText("Mes notes de frais")).toBeTruthy();
       })
     })
@@ -156,7 +155,6 @@ describe("Given I am a user connected as Employee", () => {
         create: mockCreate,
         update: mockUpdate
       };
-
       const mockStore = {
         bills() {
           return mockBills;
@@ -168,7 +166,6 @@ describe("Given I am a user connected as Employee", () => {
       root.setAttribute("id", "root")
       document.body.append(root)
       router()
-      //Both calls are necessary and complementary
       window.onNavigate(ROUTES_PATH.NewBill)
       const instance = new NewBill({ document: document, onNavigate: onNavigate, store: mockStore, localStorage: window.localStorage })
 
@@ -206,23 +203,20 @@ describe("Given I am a user connected as Employee", () => {
       const logSpy = jest.spyOn(global.console, 'error').mockImplementation(() => { });
 
       test("Then the console correctly logs the server error", async () => {
-
         mockStore.bills.mockImplementationOnce(() => {
           return {
             create: jest.fn().mockImplementation(() => Promise.reject(new Error("Erreur 400")))
-
           }
         })
         window.onNavigate(ROUTES_PATH.NewBill)
-
+        const instance = new NewBill({ document, onNavigate, store: mockStore, localStorage: window.localStorage })
         const fileInput = screen.getByTestId('file');
         const file = new File(['dummy content'], 'facturefreemobile.jpeg', { type: 'image/jpeg' });
+        const form = screen.getByTestId("form-new-bill")
         userEvent.upload(fileInput, file);
-        await waitFor(() => expect(logSpy).toHaveBeenCalled());
-
+        fireEvent.submit(form)
+        await waitFor(() => expect(logSpy).toHaveBeenCalledTimes(1));
       })
-
     })
-
   })
 })
