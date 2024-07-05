@@ -14,7 +14,6 @@ import router from "../app/Router.js";
 
 jest.mock("../app/store", () => mockStore)
 
-
 describe("Given I am connected as an employee", () => {
   describe("When I am on Bills Page", () => {
 
@@ -53,7 +52,7 @@ describe("Given I am connected as an employee", () => {
         const iconEye = screen.getAllByTestId('icon-eye')[0];
         iconEye.addEventListener('click', handleClickIconEye)
         userEvent.click(iconEye)
-        
+
         const billUrl = iconEye.getAttribute("data-bill-url")
         expect(billUrl).toBeTruthy();
 
